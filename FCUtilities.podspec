@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'FCUtilities'
-  s.version = '0.1.0'
+  s.version = '0.1.1'
   s.summary = 'Assorted common iOS utilities.'
   s.homepage = 'https://github.com/marcoarment/FCUtilities'
   s.license = { :type => 'MIT', :file => 'LICENSE' }
