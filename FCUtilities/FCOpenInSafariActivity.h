@@ -4,6 +4,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MobileCoreServices/MobileCoreServices.h>
 
 extern NSString *const FCActivityTypeOpenInSafari;
 
