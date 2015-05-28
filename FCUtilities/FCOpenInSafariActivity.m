@@ -9,6 +9,7 @@ NSString *const FCActivityTypeOpenInSafari = @"FCActivityTypeOpenInSafari";
 
 @interface FCOpenInSafariActivity ()
 @property (nonatomic) NSURL *URL;
+@property (nonatomic) NSItemProvider *URLProvider;
 @end
 
 @implementation FCOpenInSafariActivity
@@ -41,13 +42,28 @@ NSString *const FCActivityTypeOpenInSafari = @"FCActivityTypeOpenInSafari";
             if (u && ! u.isFileURL) stringURL = u;
         } else if (! URL && [item isKindOfClass:NSURL.class]) {
             if (! ((NSURL *)item).isFileURL) URL = item;
+        } else if (! URL && [item isKindOfClass:NSExtensionItem.class]) {
+            for (NSItemProvider *itemProvider in [(NSExtensionItem *)item attachments]) {
+                if (! self.URLProvider && [itemProvider hasItemConformingToTypeIdentifier:(NSString *)kUTTypeURL]) {
+                    self.URLProvider = itemProvider;
+                }
+            }
         }
     }
     
     self.URL = URL ?: stringURL;
 }
 
-- (void)performActivity { [self activityDidFinish:[UIApplication.sharedApplication openURL:self.URL]]; }
+- (void)performActivity
+{
+    if (self.URLProvider) {
+        [self.URLProvider loadItemForTypeIdentifier:(NSString *)kUTTypeURL options:nil completionHandler:^(NSURL *URL, NSError *error) {
+            [self activityDidFinish:[UIApplication.sharedApplication openURL:URL]];
+        }];
+    } else {
+        [self activityDidFinish:[UIApplication.sharedApplication openURL:self.URL]];
+    }
+}
 
 + (UIImage *)alphaSafariIconWithWidth:(CGFloat)width scale:(CGFloat)scale
 {
